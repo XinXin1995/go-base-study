@@ -23,5 +23,8 @@ func main() {
 		WriteTimeout:   setting.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-	_ = server.ListenAndServe()
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println("服务启动失败：", err)
+	}
 }

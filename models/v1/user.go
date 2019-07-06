@@ -40,3 +40,27 @@ func DeleteUser(id string) bool {
 		return true
 	}
 }
+
+// 1 不存在用户名
+func AuthUserName(name string) string {
+	user := User{
+		Name: name,
+	}
+	if db.Select("salt").Where(&user).First(&user).RecordNotFound() {
+		return ""
+	}
+	return user.Salt
+}
+
+func AuthUser(name, password string) bool {
+	user := User{
+		Name:     name,
+		Password: password,
+	}
+	res := db.Where(&user).First(&user)
+	if res.RecordNotFound() {
+		return false
+	} else {
+		return true
+	}
+}

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	v1 "blog/models/v1"
+	"blog/models/v1"
 	"blog/pkg/e"
 	"blog/pkg/util"
 	"github.com/Unknwon/com"
@@ -119,4 +119,14 @@ func DeleteRole(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 
+}
+
+func GetAllRoles(c *gin.Context) {
+	roles := v1.GetAllRoles()
+	res := &util.Res{
+		Code: e.SUCCESS,
+		Msg:  e.MsgUser[e.SUCCESS],
+		Data: roles,
+	}
+	c.JSON(http.StatusOK, res)
 }

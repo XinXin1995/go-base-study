@@ -62,10 +62,22 @@ func init() {
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
-	if !db.HasTable(tablePrefix + "user") {
-		db.CreateTable(&User{})
-		db.CreateTable(&Role{})
-	}
+	db.AutoMigrate(&User{}, &Role{}, &Module{}, &Api{}, &ModuleGroup{})
+	//if !db.HasTable(tablePrefix + "user") {
+	//	db.CreateTable(&User{})
+	//}
+	//if !db.HasTable(tablePrefix + "Role") {
+	//	db.CreateTable(&Role{})
+	//}
+	//if !db.HasTable(tablePrefix + "module") {
+	//	db.CreateTable(&Module{})
+	//}
+	//if !db.HasTable(tablePrefix + "api") {
+	//	db.CreateTable(&Api{})
+	//}
+	//if !db.HasTable(tablePrefix + "module_group") {
+	//	db.CreateTable(&ModuleGroup{})
+	//}
 }
 
 func CloseDB() {

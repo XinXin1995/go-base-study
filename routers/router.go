@@ -36,7 +36,6 @@ func Cors() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Credentials", "false")                                                                                                                                                  //  跨域请求是否需要带cookie信息 默认设置为true
 			c.Set("content-type", "application/json")                                                                                                                                                              // 设置返回格式是json
 		}
-
 		//放行所有OPTIONS方法
 		if method == "OPTIONS" {
 			c.JSON(http.StatusOK, "Options Request!")
@@ -45,6 +44,7 @@ func Cors() gin.HandlerFunc {
 		c.Next() //  处理请求
 	}
 }
+
 func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Static("/static", "./static")
@@ -55,17 +55,22 @@ func InitRouter() *gin.Engine {
 
 	apiv1 := r.Group("api/v1")
 	{
+		apiv1.POST("/user/auth", v1.AuthUser)
 		//user
 		apiv1.GET("/users", v1.GetUsers)
 		apiv1.POST("/user/register", v1.AddUser)
 		apiv1.PUT("/user/edit", v1.EditUser)
 		apiv1.DELETE("/user/:id", v1.DeleteUser)
-		//apiv1.GET("/user/login", v1.Login)
+
 		//role
 		apiv1.GET("/roles", v1.GetRoles)
 		apiv1.POST("/role/add", v1.AddRole)
 		apiv1.PUT("/role/edit", v1.EditRole)
 		apiv1.DELETE("/role/:id", v1.DeleteRole)
+		apiv1.GET("/roles/all", v1.GetAllRoles)
+
+		//moduleGroup
+		apiv1.POST("/moduleGroup/add", v1.AddModuleGroup)
 
 		apiv1.POST("/singleUpload", v1.UploadSingle)
 	}

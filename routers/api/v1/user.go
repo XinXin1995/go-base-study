@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"time"
 )
 
 func GetUsers(c *gin.Context) {
@@ -42,25 +43,34 @@ func AddUser(c *gin.Context) {
 	name := c.PostForm("name")
 	password := c.DefaultPostForm("password", "123456")
 	avatar := c.PostForm("avatar")
+	roleUuid := c.DefaultPostForm("roleUuid", "")
 	valid := validation.Validation{}
 	valid.Required(name, "name").Message("登录名为空")
 	valid.Required(password, "password").Message("密码不能为空")
 	valid.Required(avatar, "avatar").Message("头像不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		password, salt := util.GeneratePwd(password)
-		user := &v1.User{
-			Name:     name,
-			Password: password,
-			Avatar:   avatar,
-			Salt:     salt,
-		}
-		b := v1.AddUser(user)
-		if b {
-			code = e.SUCCESS
+		salts := v1.AuthUserName(name)
+		if salts == "" {
+			salt := com.ToStr(time.Now().Unix())
+			password = util.GeneratePwd(password, salt)
+			user := &v1.User{
+				Name:     name,
+				Password: password,
+				Avatar:   avatar,
+				RoleUuid: roleUuid,
+				Salt:     salt,
+			}
+			b := v1.AddUser(user)
+			if b {
+				code = e.SUCCESS
+			} else {
+				code = e.ERROR
+			}
 		} else {
-			code = e.ERROR
+			code = e.ERROR_EXIST_USER
 		}
+
 	} else {
 		for _, err := range valid.Errors {
 			log.Fatalln(err.Key, err.Message)
@@ -78,15 +88,18 @@ func EditUser(c *gin.Context) {
 	id := c.PostForm("id")
 	name := c.PostForm("name")
 	avatar := c.PostForm("avatar")
+	roleUuid := c.PostForm("roleUuid")
 	valid := validation.Validation{}
 	valid.Required(id, "id").Message("用户ID不能为空")
 	valid.Required(name, "name").Message("登录名为空")
 	valid.Required(avatar, "avatar").Message("头像不能为空")
+	valid.Required(roleUuid, "roleUuid").Message("角色ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		user := &v1.User{
-			Name:   name,
-			Avatar: avatar,
+			Name:     name,
+			Avatar:   avatar,
+			RoleUuid: roleUuid,
 		}
 		b := v1.EditUser(user, id)
 		if b {
@@ -131,4 +144,43 @@ func DeleteUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 
+}
+
+func AuthUser(c *gin.Context) {
+	name := c.PostForm("name")
+	password := c.PostForm("password")
+	valid := validation.Validation{}
+	valid.Required(name, "name").Message("登录名为空")
+	valid.Required(password, "password").Message("密码不能为空")
+	code := e.INVALID_PARAMS
+	data := ""
+	if !valid.HasErrors() {
+		salt := v1.AuthUserName(name)
+		if salt != "" {
+			password = util.GeneratePwd(password, salt)
+			b := v1.AuthUser(name, password)
+			if b {
+				//验证成功
+				token, _ := util.GenerateToken(name, password)
+				code = e.SUCCESS
+				data = token
+			} else {
+				code = e.ERROR_PASSWORD
+			}
+		} else {
+			code = e.ERROR_NOT_EXIST_USER
+		}
+	} else {
+		for _, err := range valid.Errors {
+			log.Fatalln(err.Key, err.Message)
+		}
+	}
+	res := &util.Res{
+		Code: code,
+		Msg:  e.MsgUser[code],
+	}
+	if data != "" {
+		res.Data = data
+	}
+	c.JSON(http.StatusOK, res)
 }

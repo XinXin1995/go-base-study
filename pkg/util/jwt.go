@@ -4,8 +4,6 @@ import (
 	"blog/pkg/setting"
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
-	"github.com/Unknwon/com"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -48,14 +46,11 @@ func ParseToken(token string) (*Claims, error) {
 	return nil, err
 }
 
-func GeneratePwd(password string) (newPassword string, salt string) {
-	salt = com.ToStr(time.Now().Unix())
+func GeneratePwd(password string, salt string) (newPassword string) {
 	m5 := md5.New()
 	m5.Write([]byte(password))
 	m5.Write([]byte(salt))
 	st := m5.Sum(nil)
 	newPassword = hex.EncodeToString(st)
-	fmt.Println("newPassword : ", newPassword)
-	fmt.Println("salt : ", salt)
 	return
 }

@@ -1,8 +1,11 @@
 package v1
 
+import "log"
+
 type Role struct {
 	Model
-	Name string `json:"name"`
+	Name    string   `json:"name"`
+	Modules []Module `gorm:"many2many:role_modules;"`
 }
 
 func GetRoles(pageSize int, pageNo int, name string) (role []Role, count int) {
@@ -11,6 +14,7 @@ func GetRoles(pageSize int, pageNo int, name string) (role []Role, count int) {
 	db.Model(&Role{}).Where("name LIKE ?", "%"+name+"%").Count(&count)
 	return
 }
+
 func AddRole(role *Role) bool {
 	err := db.Create(role).Error
 	if err != nil {
@@ -34,4 +38,12 @@ func DeleteRole(id string) bool {
 	} else {
 		return true
 	}
+}
+
+func GetAllRoles() (roles []Role) {
+	err := db.Find(&roles).Error
+	if err != nil {
+		log.Fatalln("mysql err: ", err)
+	}
+	return
 }
