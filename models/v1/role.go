@@ -1,6 +1,9 @@
 package v1
 
-import "log"
+import (
+	"github.com/satori/go.uuid"
+	"log"
+)
 
 type Role struct {
 	Model
@@ -45,5 +48,12 @@ func GetAllRoles() (roles []Role) {
 	if err != nil {
 		log.Fatalln("mysql err: ", err)
 	}
+	return
+}
+
+func GetRoleModules(id string) (modules []Module) {
+	role := &Role{}
+	role.Uuid = uuid.FromStringOrNil(id)
+	db.Model(role).Preload("ModuleGroup").Related(&modules, "Modules")
 	return
 }

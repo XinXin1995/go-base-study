@@ -361,6 +361,7 @@ func (scope *Scope) Exec() *Scope {
 	defer scope.trace(scope.db.nowFunc())
 
 	if !scope.HasError() {
+		fmt.Println(scope.SQL)
 		if result, err := scope.SQLDB().Exec(scope.SQL, scope.SQLVars...); scope.Err(err) == nil {
 			if count, err := result.RowsAffected(); scope.Err(err) == nil {
 				scope.db.RowsAffected = count

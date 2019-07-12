@@ -5,7 +5,6 @@ import (
 	"blog/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func main() {
@@ -15,16 +14,16 @@ func main() {
 			"message": "test",
 		})
 	})
-	//_ = router.Run(fmt.Sprintf(":%d", setting.HTTPPort))
-	server := &http.Server{
-		Addr:           fmt.Sprintf("127.0.0.1:%d", setting.HTTPPort),
-		Handler:        router,
-		ReadTimeout:    setting.ReadTimeout,
-		WriteTimeout:   setting.WriteTimeout,
-		MaxHeaderBytes: 1 << 20,
-	}
-	err := server.ListenAndServe()
-	if err != nil {
-		fmt.Println("服务启动失败：", err)
-	}
+	_ = router.Run(fmt.Sprintf(":%d", setting.HTTPPort))
+	//server := &http.Server{
+	//	Addr:           fmt.Sprintf("127.0.0.1:%d", setting.HTTPPort),
+	//	Handler:        router,
+	//	ReadTimeout:    setting.ReadTimeout,
+	//	WriteTimeout:   setting.WriteTimeout,
+	//	MaxHeaderBytes: 1 << 20,
+	//}
+	//err := server.ListenAndServe()
+	//if err != nil {
+	//	fmt.Println("服务启动失败：", err)
+	//}
 }

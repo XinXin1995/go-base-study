@@ -66,7 +66,7 @@ func AddRole(c *gin.Context) {
 }
 
 func EditRole(c *gin.Context) {
-	id := c.PostForm("id")
+	id := c.Param("id")
 	name := c.PostForm("name")
 	valid := validation.Validation{}
 	valid.Required(id, "id").Message("角色ID不能为空")
@@ -128,5 +128,22 @@ func GetAllRoles(c *gin.Context) {
 		Msg:  e.MsgUser[e.SUCCESS],
 		Data: roles,
 	}
+	c.JSON(http.StatusOK, res)
+}
+
+func GetRoleModules(c *gin.Context) {
+	id := c.Query("id")
+	valid := validation.Validation{}
+	valid.Required(id, "id").Message("模块id不能为空")
+	code := e.INVALID_PARAMS
+	res := util.Res{}
+	if !valid.HasErrors() {
+		code = e.SUCCESS
+		res.Msg = e.MsgUser[code]
+		res.Data = v1.GetRoleModules(id)
+	} else {
+		util.LoopLog(valid.Errors)
+	}
+	res.Code = code
 	c.JSON(http.StatusOK, res)
 }

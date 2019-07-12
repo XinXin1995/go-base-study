@@ -7,6 +7,6 @@ import (
 
 func LoopLog(errors []*validation.Error) {
 	for _, err := range errors {
-		log.Fatalln(err.Key, err.Message)
+		log.Println(err.Key, err.Message)
 	}
 }
