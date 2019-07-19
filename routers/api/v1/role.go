@@ -7,6 +7,7 @@ import (
 	"github.com/Unknwon/com"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
 	"log"
 	"net/http"
 )
@@ -140,10 +141,37 @@ func GetRoleModules(c *gin.Context) {
 	if !valid.HasErrors() {
 		code = e.SUCCESS
 		res.Msg = e.MsgUser[code]
-		res.Data = v1.GetRoleModules(id)
+		res.Data = v1.GetRoleModules(uuid.FromStringOrNil(id))
 	} else {
 		util.LoopLog(valid.Errors)
 	}
 	res.Code = code
+	c.JSON(http.StatusOK, res)
+}
+func AddRoelModules(c *gin.Context) {
+	RM := v1.RoleModules{}
+	err := c.BindJSON(&RM)
+	code := e.INVALID_PARAMS
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, &util.Res{
+			Code: code,
+			Msg:  e.MsgUser[code],
+		})
+		return
+	} else {
+		id := uuid.FromStringOrNil(RM.Id)
+		modules := RM.Modules
+		b := v1.AddRoleModules(id, modules)
+		if b {
+			code = e.SUCCESS
+		} else {
+			code = e.ERROR
+		}
+	}
+	res := &util.Res{
+		Code: code,
+		Msg:  e.MsgUser[code],
+	}
 	c.JSON(http.StatusOK, res)
 }

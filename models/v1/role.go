@@ -11,6 +11,11 @@ type Role struct {
 	Modules []Module `gorm:"many2many:role_modules;"`
 }
 
+type RoleModules struct {
+	Id      string   `json:"id"`
+	Modules []string `json:"modules"`
+}
+
 func GetRoles(pageSize int, pageNo int, name string) (role []Role, count int) {
 	offset := (pageNo - 1) * pageSize
 	db.Where("name LIKE ?", "%"+name+"%").Limit(pageSize).Offset(offset).Find(&role)
@@ -51,9 +56,37 @@ func GetAllRoles() (roles []Role) {
 	return
 }
 
-func GetRoleModules(id string) (modules []Module) {
+func GetRoleModules(roleUuid uuid.UUID) (modules []Module) {
 	role := &Role{}
-	role.Uuid = uuid.FromStringOrNil(id)
-	db.Model(role).Preload("ModuleGroup").Related(&modules, "Modules")
+	role.Uuid = roleUuid
+	db.Model(role).Related(&modules, "Modules")
 	return
+}
+
+func AddRoleModules(roleUuid uuid.UUID, modules []string) bool {
+	tx := db.Begin()
+	if err := tx.Delete(RolesModules{}, "role_uuid = ?", roleUuid).Error; err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return false
+	}
+	for _, v := range modules {
+		moduleUuid, err := uuid.FromString(v)
+		if err == nil {
+			ra := &RolesModules{
+				RoleUuid:   roleUuid,
+				ModuleUuid: moduleUuid,
+			}
+			if err := tx.Create(ra).Error; err != nil {
+				log.Println(err)
+				tx.Rollback()
+				return false
+			}
+		} else {
+			tx.Rollback()
+			return false
+		}
+	}
+	tx.Commit()
+	return true
 }

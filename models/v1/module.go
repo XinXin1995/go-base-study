@@ -9,6 +9,7 @@ type Module struct {
 	Model
 	Name     string `json:"name" form:"name" binding:""`
 	Router   string `json:"router"`
+	Icon     string `json:"icon"`
 	Apis     []Api  `json:"apis" gorm:"many2many:modules_apis"`
 	ParentId string `json:"parentId"`
 }
@@ -54,6 +55,11 @@ func EditModule(module *Module, id string) bool {
 	} else {
 		return true
 	}
+}
+
+func GetAllModules() (modules []Module) {
+	db.Find(&modules)
+	return
 }
 
 func AddModuleApis(apis []string, moduleUuid uuid.UUID) bool {

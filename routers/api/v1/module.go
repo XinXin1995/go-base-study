@@ -8,12 +8,14 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
+	"log"
 	"net/http"
 )
 
 func AddModule(c *gin.Context) {
 	name := c.PostForm("name")
 	parentId := c.DefaultPostForm("parentId", "")
+	icon := c.DefaultPostForm("icon", "")
 	router := c.DefaultPostForm("router", "")
 	valid := validation.Validation{}
 	valid.Required(name, "name").Message("模块名称未填写")
@@ -23,6 +25,7 @@ func AddModule(c *gin.Context) {
 			Name:     name,
 			ParentId: parentId,
 			Router:   router,
+			Icon:     icon,
 		}
 		b := v1.AddModule(module)
 		if b {
@@ -64,6 +67,17 @@ func GetModules(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func GetAllModules(c *gin.Context) {
+	modules := v1.GetAllModules()
+	code := e.SUCCESS
+	res := &util.Res{
+		Code: code,
+		Msg:  e.MsgUser[code],
+		Data: modules,
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 func DeleteModule(c *gin.Context) {
 	id := c.Param("id")
 	valid := validation.Validation{}
@@ -92,6 +106,7 @@ func DeleteModule(c *gin.Context) {
 func EditModule(c *gin.Context) {
 	id := c.Param("id")
 	name := c.PostForm("name")
+	icon := c.DefaultPostForm("icon", "")
 	parentId := c.DefaultPostForm("parentId", "")
 	router := c.DefaultPostForm("router", "")
 	valid := validation.Validation{}
@@ -103,6 +118,7 @@ func EditModule(c *gin.Context) {
 			Name:     name,
 			ParentId: parentId,
 			Router:   router,
+			Icon:     icon,
 		}
 		b := v1.EditModule(module, id)
 		if b {
@@ -122,12 +138,12 @@ func EditModule(c *gin.Context) {
 }
 
 func AddModuleApis(c *gin.Context) {
-
 	MA := v1.ModuleApis{}
 	err := c.BindJSON(&MA)
 	code := e.INVALID_PARAMS
 	if err != nil {
-		c.JSON(http.StatusOK, &util.Res{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, &util.Res{
 			Code: code,
 			Msg:  e.MsgUser[code],
 		})

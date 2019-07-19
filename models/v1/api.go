@@ -4,8 +4,9 @@ import "log"
 
 type Api struct {
 	Model
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Name   string `json:"name"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
 }
 
 func AddApi(api *Api) bool {
@@ -42,4 +43,9 @@ func EditApi(api *Api, id string) bool {
 	} else {
 		return true
 	}
+}
+
+func GetAllApis() (apis []Api) {
+	db.Find(&apis)
+	return
 }

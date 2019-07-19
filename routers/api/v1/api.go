@@ -12,15 +12,18 @@ import (
 
 func AddApi(c *gin.Context) {
 	name := c.PostForm("name")
+	method := c.PostForm("method")
 	path := c.PostForm("path")
 	valid := validation.Validation{}
 	valid.Required(name, "name").Message("api名称未填写")
+	valid.Required(method, "method").Message("请求方式未填写")
 	valid.Required(path, "path").Message("api路劲未填写")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		api := &v1.Api{
-			Name: name,
-			Path: path,
+			Name:   name,
+			Path:   path,
+			Method: method,
 		}
 		b := v1.AddApi(api)
 		if b {
@@ -62,6 +65,16 @@ func GetApis(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func GetAllApis(c *gin.Context) {
+	apis := v1.GetAllApis()
+	res := &util.Res{
+		Code: e.SUCCESS,
+		Msg:  e.MsgUser[e.SUCCESS],
+		Data: apis,
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 func DeleteApi(c *gin.Context) {
 	id := c.Param("id")
 	valid := validation.Validation{}
@@ -88,16 +101,19 @@ func DeleteApi(c *gin.Context) {
 func EditApi(c *gin.Context) {
 	id := c.Param("id")
 	name := c.PostForm("name")
+	method := c.PostForm("method")
 	path := c.PostForm("path")
 	valid := validation.Validation{}
 	valid.Required(id, "id").Message("apiID不能为空")
 	valid.Required(name, "name").Message("api名称为空")
+	valid.Required(method, "method").Message("请求方式为空")
 	valid.Required(path, "path").Message("api路径不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		api := &v1.Api{
-			Name: name,
-			Path: path,
+			Name:   name,
+			Path:   path,
+			Method: method,
 		}
 		b := v1.EditApi(api, id)
 		if b {

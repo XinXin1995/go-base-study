@@ -15,7 +15,7 @@ var db *gorm.DB
 type Model struct {
 	Uuid      uuid.UUID `gorm:"primary_key" json:"id"`
 	CreatedAt int32     `json:"createdAt"`
-	UpdatedON int32     `json:"updatedAt"`
+	UpdatedOn int32     `json:"updatedAt"`
 }
 
 func (m *Model) BeforeCreate(scope *gorm.Scope) error {
@@ -29,8 +29,8 @@ func (m *Model) BeforeCreate(scope *gorm.Scope) error {
 	return err
 }
 
-func (r *Role) BeforeUpdate(scope *gorm.Scope) error {
-	return scope.SetColumn("UpdatedON", time.Now().Unix())
+func (m *Model) BeforeUpdate(scope *gorm.Scope) error {
+	return scope.SetColumn("UpdatedOn", time.Now().Unix())
 }
 
 func init() {

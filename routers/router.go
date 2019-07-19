@@ -30,11 +30,13 @@ func InitRouter() *gin.Engine {
 		apiv1.PUT("/role/:id", v1.EditRole)
 		apiv1.DELETE("/role/:id", v1.DeleteRole)
 		apiv1.GET("/roles/all", v1.GetAllRoles)
+		apiv1.GET("/role/moduleAdd", v1.AddRoelModules)
 		apiv1.GET("/role/modules", v1.GetRoleModules)
 
 		//module
 		apiv1.POST("/module/add", v1.AddModule)
 		apiv1.GET("/modules", v1.GetModules)
+		apiv1.GET("/modules/all", v1.GetAllModules)
 		apiv1.DELETE("/module/:id", v1.DeleteModule)
 		apiv1.PUT("/module/:id", v1.EditModule)
 		apiv1.POST("/module/api/add", v1.AddModuleApis)
@@ -42,6 +44,7 @@ func InitRouter() *gin.Engine {
 		//api
 		apiv1.POST("/api/add", v1.AddApi)
 		apiv1.GET("/apis", v1.GetApis)
+		apiv1.GET("/apis/all", v1.GetAllApis)
 		apiv1.DELETE("/api/:id", v1.DeleteApi)
 		apiv1.PUT("/api/:id", v1.EditApi)
 
