@@ -8,7 +8,7 @@ import (
 type Role struct {
 	Model
 	Name    string   `json:"name"`
-	Modules []Module `gorm:"many2many:role_modules;"`
+	Modules []Module `gorm:"many2many:roles_modules;"`
 }
 
 type RoleModules struct {

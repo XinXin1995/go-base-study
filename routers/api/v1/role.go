@@ -148,7 +148,7 @@ func GetRoleModules(c *gin.Context) {
 	res.Code = code
 	c.JSON(http.StatusOK, res)
 }
-func AddRoelModules(c *gin.Context) {
+func AddRoleModules(c *gin.Context) {
 	RM := v1.RoleModules{}
 	err := c.BindJSON(&RM)
 	code := e.INVALID_PARAMS

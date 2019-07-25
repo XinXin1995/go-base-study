@@ -72,9 +72,7 @@ func AddUser(c *gin.Context) {
 		}
 
 	} else {
-		for _, err := range valid.Errors {
-			log.Fatalln(err.Key, err.Message)
-		}
+		util.LoopLog(valid.Errors)
 	}
 	res := &util.Res{
 		Code: code,

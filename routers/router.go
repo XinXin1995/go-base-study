@@ -20,29 +20,29 @@ func InitRouter() *gin.Engine {
 		apiv1.POST("/user/auth", v1.AuthUser)
 		//user
 		apiv1.GET("/users", v1.GetUsers)
-		apiv1.POST("/user/register", v1.AddUser)
-		apiv1.PUT("/user/edit", v1.EditUser)
+		apiv1.POST("/user", v1.AddUser)
+		apiv1.PUT("/user", v1.EditUser)
 		apiv1.DELETE("/user/:id", v1.DeleteUser)
 
 		//role
 		apiv1.GET("/roles", v1.GetRoles)
-		apiv1.POST("/role/add", v1.AddRole)
+		apiv1.POST("/role", v1.AddRole)
 		apiv1.PUT("/role/:id", v1.EditRole)
 		apiv1.DELETE("/role/:id", v1.DeleteRole)
 		apiv1.GET("/roles/all", v1.GetAllRoles)
-		apiv1.GET("/role/moduleAdd", v1.AddRoelModules)
+		apiv1.POST("/role/moduleAdd", v1.AddRoleModules)
 		apiv1.GET("/role/modules", v1.GetRoleModules)
 
 		//module
-		apiv1.POST("/module/add", v1.AddModule)
+		apiv1.POST("/module", v1.AddModule)
 		apiv1.GET("/modules", v1.GetModules)
 		apiv1.GET("/modules/all", v1.GetAllModules)
 		apiv1.DELETE("/module/:id", v1.DeleteModule)
 		apiv1.PUT("/module/:id", v1.EditModule)
-		apiv1.POST("/module/api/add", v1.AddModuleApis)
+		apiv1.POST("/module/api", v1.AddModuleApis)
 		apiv1.GET("/module/apis", v1.ModuleApis)
 		//api
-		apiv1.POST("/api/add", v1.AddApi)
+		apiv1.POST("/api", v1.AddApi)
 		apiv1.GET("/apis", v1.GetApis)
 		apiv1.GET("/apis/all", v1.GetAllApis)
 		apiv1.DELETE("/api/:id", v1.DeleteApi)
