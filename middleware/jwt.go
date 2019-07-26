@@ -11,9 +11,8 @@ import (
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var code int
-
 		code = e.SUCCESS
-		token := c.GetHeader("Authorization")
+		token := c.Request.Header.Get("Authorization")
 		if token == "" {
 			code = e.INVALID_PARAMS
 		} else {
@@ -31,7 +30,7 @@ func JWT() gin.HandlerFunc {
 				Code: code,
 				Msg:  e.MsgUser[code],
 			}
-			c.JSON(http.StatusUnauthorized, res)
+			c.JSON(http.StatusOK, res)
 			c.Abort()
 			return
 		}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"blog/pkg/setting"
+	"blog/pkg/set"
 	"blog/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ func main() {
 			"message": "test",
 		})
 	})
-	_ = router.Run(fmt.Sprintf(":%d", setting.HTTPPort))
+	_ = router.Run(fmt.Sprintf(":%d", set.HTTPPort))
 	//server := &http.Server{
 	//	Addr:           fmt.Sprintf("127.0.0.1:%d", setting.HTTPPort),
 	//	Handler:        router,

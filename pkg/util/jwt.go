@@ -1,27 +1,33 @@
 package util
 
 import (
-	"blog/pkg/setting"
+	"blog/models"
+	"blog/pkg/set"
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/satori/go.uuid"
 	"time"
 )
 
-var jwtSecret = []byte(setting.JwtSecret)
+var jwtSecret = []byte(set.JwtSecret)
 
 type Claims struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Uuid     uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Password string    `json:"password"`
+	RoleUuid string    `json:"roleUuid"`
 	jwt.StandardClaims
 }
 
-func GenerateToken(username, password string) (string, error) {
+func GenerateToken(user *models.User) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour)
 	claims := Claims{
-		username,
-		password,
+		user.Uuid,
+		user.Name,
+		user.Password,
+		user.RoleUuid,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "gin-blog",

@@ -1,4 +1,6 @@
-package v1
+package models
+
+import "github.com/satori/go.uuid"
 
 type User struct {
 	Model
@@ -24,6 +26,7 @@ func EditUser(user *User, id string) bool {
 	}
 	return true
 }
+
 func AddUser(user *User) bool {
 	err := db.Create(user).Error
 	if err != nil {
@@ -52,15 +55,23 @@ func AuthUserName(name string) string {
 	return user.Salt
 }
 
-func AuthUser(name, password string) bool {
-	user := User{
+func AuthUser(name, password string) (b bool, user *User) {
+	user = &User{
 		Name:     name,
 		Password: password,
 	}
 	res := db.Where(&user).First(&user)
 	if res.RecordNotFound() {
-		return false
+		b = false
 	} else {
-		return true
+		b = true
 	}
+	return
+}
+
+func GetUser(uuid uuid.UUID) (user *User) {
+	user = &User{}
+	user.Uuid = uuid
+	db.First(user)
+	return
 }

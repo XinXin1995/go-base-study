@@ -1,7 +1,7 @@
-package v1
+package setting
 
 import (
-	"blog/models/v1"
+	"blog/models"
 	"blog/pkg/e"
 	"blog/pkg/util"
 	"github.com/Unknwon/com"
@@ -20,12 +20,12 @@ func AddApi(c *gin.Context) {
 	valid.Required(path, "path").Message("api路劲未填写")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		api := &v1.Api{
+		api := &models.Api{
 			Name:   name,
 			Path:   path,
 			Method: method,
 		}
-		b := v1.AddApi(api)
+		b := models.AddApi(api)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -52,7 +52,7 @@ func GetApis(c *gin.Context) {
 	data := make(map[string]interface{})
 	if !valid.HasErrors() {
 		code = e.SUCCESS
-		data["list"], data["total"] = v1.GetApis(pageSize, pageNo, name)
+		data["list"], data["total"] = models.GetApis(pageSize, pageNo, name)
 	} else {
 		util.LoopLog(valid.Errors)
 	}
@@ -66,7 +66,7 @@ func GetApis(c *gin.Context) {
 }
 
 func GetAllApis(c *gin.Context) {
-	apis := v1.GetAllApis()
+	apis := models.GetAllApis()
 	res := &util.Res{
 		Code: e.SUCCESS,
 		Msg:  e.MsgUser[e.SUCCESS],
@@ -81,7 +81,7 @@ func DeleteApi(c *gin.Context) {
 	valid.Required(id, "id").Message("分组ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		b := v1.DeleteApi(id)
+		b := models.DeleteApi(id)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -110,12 +110,12 @@ func EditApi(c *gin.Context) {
 	valid.Required(path, "path").Message("api路径不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		api := &v1.Api{
+		api := &models.Api{
 			Name:   name,
 			Path:   path,
 			Method: method,
 		}
-		b := v1.EditApi(api, id)
+		b := models.EditApi(api, id)
 		if b {
 			code = e.SUCCESS
 		} else {

@@ -1,4 +1,4 @@
-package v1
+package space
 
 import (
 	"blog/pkg/e"

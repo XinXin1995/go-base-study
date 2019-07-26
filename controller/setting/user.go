@@ -1,13 +1,13 @@
-package v1
+package setting
 
 import (
-	"blog/models/v1"
+	"blog/models"
 	"blog/pkg/e"
 	"blog/pkg/util"
 	"github.com/Unknwon/com"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
-	"log"
+	"github.com/satori/go.uuid"
 	"net/http"
 	"time"
 )
@@ -23,12 +23,10 @@ func GetUsers(c *gin.Context) {
 	data := make(map[string]interface{})
 	if !valid.HasErrors() {
 		code = e.SUCCESS
-		data["list"], data["total"] = v1.GetUsers(pageSize, pageNo, name)
+		data["list"], data["total"] = models.GetUsers(pageSize, pageNo, name)
 
 	} else {
-		for _, err := range valid.Errors {
-			log.Fatalln(err.Key, err.Message)
-		}
+		util.LoopLog(valid.Errors)
 	}
 	res := &util.Res{
 		Code: code,
@@ -36,6 +34,22 @@ func GetUsers(c *gin.Context) {
 		Data: data,
 	}
 
+	c.JSON(http.StatusOK, res)
+}
+
+func GetUser(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	claims, err := util.ParseToken(token)
+	res := &util.Res{}
+	data := make(map[string]interface{})
+	if err != nil {
+		res.Code = e.INVALID_PARAMS
+		res.Msg = e.MsgUser[res.Code]
+	} else {
+		data["user"] = models.GetUser(claims.Uuid)
+		data["modules"] = models.GetRoleModules(uuid.FromStringOrNil(claims.RoleUuid))
+		res.Data = data
+	}
 	c.JSON(http.StatusOK, res)
 }
 
@@ -50,18 +64,18 @@ func AddUser(c *gin.Context) {
 	valid.Required(avatar, "avatar").Message("头像不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		salts := v1.AuthUserName(name)
+		salts := models.AuthUserName(name)
 		if salts == "" {
 			salt := com.ToStr(time.Now().Unix())
 			password = util.GeneratePwd(password, salt)
-			user := &v1.User{
+			user := &models.User{
 				Name:     name,
 				Password: password,
 				Avatar:   avatar,
 				RoleUuid: roleUuid,
 				Salt:     salt,
 			}
-			b := v1.AddUser(user)
+			b := models.AddUser(user)
 			if b {
 				code = e.SUCCESS
 			} else {
@@ -94,21 +108,19 @@ func EditUser(c *gin.Context) {
 	valid.Required(roleUuid, "roleUuid").Message("角色ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		user := &v1.User{
+		user := &models.User{
 			Name:     name,
 			Avatar:   avatar,
 			RoleUuid: roleUuid,
 		}
-		b := v1.EditUser(user, id)
+		b := models.EditUser(user, id)
 		if b {
 			code = e.SUCCESS
 		} else {
 			code = e.ERROR
 		}
 	} else {
-		for _, err := range valid.Errors {
-			log.Fatalln(err.Key, err.Message)
-		}
+		util.LoopLog(valid.Errors)
 	}
 	res := &util.Res{
 		Code: code,
@@ -124,16 +136,14 @@ func DeleteUser(c *gin.Context) {
 	valid.Required(id, "id").Message("用户ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		b := v1.DeleteUser(id)
+		b := models.DeleteUser(id)
 		if b {
 			code = e.SUCCESS
 		} else {
 			code = e.ERROR
 		}
 	} else {
-		for _, err := range valid.Errors {
-			log.Fatalln(err.Key, err.Message)
-		}
+		util.LoopLog(valid.Errors)
 	}
 	res := &util.Res{
 		Code: code,
@@ -151,17 +161,20 @@ func AuthUser(c *gin.Context) {
 	valid.Required(name, "name").Message("登录名为空")
 	valid.Required(password, "password").Message("密码不能为空")
 	code := e.INVALID_PARAMS
-	data := ""
+	data := make(map[string]interface{})
 	if !valid.HasErrors() {
-		salt := v1.AuthUserName(name)
+		salt := models.AuthUserName(name)
 		if salt != "" {
 			password = util.GeneratePwd(password, salt)
-			b := v1.AuthUser(name, password)
+			b, user := models.AuthUser(name, password)
 			if b {
+				modules := models.GetRoleModules(uuid.FromStringOrNil(user.RoleUuid))
 				//验证成功
-				token, _ := util.GenerateToken(name, password)
+				token, _ := util.GenerateToken(user)
 				code = e.SUCCESS
-				data = token
+				data["token"] = token
+				data["modules"] = modules
+				data["user"] = user
 			} else {
 				code = e.ERROR_PASSWORD
 			}
@@ -169,15 +182,13 @@ func AuthUser(c *gin.Context) {
 			code = e.ERROR_NOT_EXIST_USER
 		}
 	} else {
-		for _, err := range valid.Errors {
-			log.Fatalln(err.Key, err.Message)
-		}
+		util.LoopLog(valid.Errors)
 	}
 	res := &util.Res{
 		Code: code,
 		Msg:  e.MsgUser[code],
 	}
-	if data != "" {
+	if data != nil {
 		res.Data = data
 	}
 	c.JSON(http.StatusOK, res)

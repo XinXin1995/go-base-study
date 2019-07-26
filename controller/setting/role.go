@@ -1,7 +1,7 @@
-package v1
+package setting
 
 import (
-	"blog/models/v1"
+	"blog/models"
 	"blog/pkg/e"
 	"blog/pkg/util"
 	"github.com/Unknwon/com"
@@ -23,7 +23,7 @@ func GetRoles(c *gin.Context) {
 	data := make(map[string]interface{})
 	if !valid.HasErrors() {
 		code = e.SUCCESS
-		data["list"], data["total"] = v1.GetRoles(pageSize, pageNo, name)
+		data["list"], data["total"] = models.GetRoles(pageSize, pageNo, name)
 	} else {
 		for _, err := range valid.Errors {
 			log.Fatalln(err.Key, err.Message)
@@ -44,10 +44,10 @@ func AddRole(c *gin.Context) {
 	valid.Required(name, "name").Message("角色名称为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		role := &v1.Role{
+		role := &models.Role{
 			Name: name,
 		}
-		b := v1.AddRole(role)
+		b := models.AddRole(role)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -74,10 +74,10 @@ func EditRole(c *gin.Context) {
 	valid.Required(name, "name").Message("角色名称为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		role := &v1.Role{
+		role := &models.Role{
 			Name: name,
 		}
-		b := v1.EditRole(role, id)
+		b := models.EditRole(role, id)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -102,7 +102,7 @@ func DeleteRole(c *gin.Context) {
 	valid.Required(id, "id").Message("角色ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		b := v1.DeleteRole(id)
+		b := models.DeleteRole(id)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -123,7 +123,7 @@ func DeleteRole(c *gin.Context) {
 }
 
 func GetAllRoles(c *gin.Context) {
-	roles := v1.GetAllRoles()
+	roles := models.GetAllRoles()
 	res := &util.Res{
 		Code: e.SUCCESS,
 		Msg:  e.MsgUser[e.SUCCESS],
@@ -141,15 +141,16 @@ func GetRoleModules(c *gin.Context) {
 	if !valid.HasErrors() {
 		code = e.SUCCESS
 		res.Msg = e.MsgUser[code]
-		res.Data = v1.GetRoleModules(uuid.FromStringOrNil(id))
+		res.Data = models.GetRoleModules(uuid.FromStringOrNil(id))
 	} else {
 		util.LoopLog(valid.Errors)
 	}
 	res.Code = code
 	c.JSON(http.StatusOK, res)
 }
+
 func AddRoleModules(c *gin.Context) {
-	RM := v1.RoleModules{}
+	RM := models.RoleModules{}
 	err := c.BindJSON(&RM)
 	code := e.INVALID_PARAMS
 	if err != nil {
@@ -162,7 +163,7 @@ func AddRoleModules(c *gin.Context) {
 	} else {
 		id := uuid.FromStringOrNil(RM.Id)
 		modules := RM.Modules
-		b := v1.AddRoleModules(id, modules)
+		b := models.AddRoleModules(id, modules)
 		if b {
 			code = e.SUCCESS
 		} else {

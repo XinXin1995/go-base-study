@@ -1,4 +1,4 @@
-package v1
+package models
 
 import (
 	"github.com/satori/go.uuid"
@@ -14,6 +14,11 @@ type Role struct {
 type RoleModules struct {
 	Id      string   `json:"id"`
 	Modules []string `json:"modules"`
+}
+
+type RoleApis struct {
+	Id   string   `json:"id"`
+	Apis []string `json:"apis"`
 }
 
 func GetRoles(pageSize int, pageNo int, name string) (role []Role, count int) {

@@ -1,4 +1,4 @@
-package setting
+package set
 
 import (
 	"github.com/go-ini/ini"

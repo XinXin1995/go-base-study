@@ -1,7 +1,7 @@
-package v1
+package setting
 
 import (
-	"blog/models/v1"
+	"blog/models"
 	"blog/pkg/e"
 	"blog/pkg/util"
 	"github.com/Unknwon/com"
@@ -21,13 +21,13 @@ func AddModule(c *gin.Context) {
 	valid.Required(name, "name").Message("模块名称未填写")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		module := &v1.Module{
+		module := &models.Module{
 			Name:     name,
 			ParentId: parentId,
 			Router:   router,
 			Icon:     icon,
 		}
-		b := v1.AddModule(module)
+		b := models.AddModule(module)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -54,7 +54,7 @@ func GetModules(c *gin.Context) {
 	data := make(map[string]interface{})
 	if !valid.HasErrors() {
 		code = e.SUCCESS
-		data["list"], data["total"] = v1.GetModules(pageSize, pageNo, name)
+		data["list"], data["total"] = models.GetModules(pageSize, pageNo, name)
 	} else {
 		util.LoopLog(valid.Errors)
 	}
@@ -68,7 +68,7 @@ func GetModules(c *gin.Context) {
 }
 
 func GetAllModules(c *gin.Context) {
-	modules := v1.GetAllModules()
+	modules := models.GetAllModules()
 	code := e.SUCCESS
 	res := &util.Res{
 		Code: code,
@@ -84,7 +84,7 @@ func DeleteModule(c *gin.Context) {
 	valid.Required(id, "id").Message("分组ID不能为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		b := v1.DeleteModule(id)
+		b := models.DeleteModule(id)
 		if b == 0 {
 			code = e.SUCCESS
 		} else if b == 1 {
@@ -114,13 +114,13 @@ func EditModule(c *gin.Context) {
 	valid.Required(name, "name").Message("角色名称为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
-		module := &v1.Module{
+		module := &models.Module{
 			Name:     name,
 			ParentId: parentId,
 			Router:   router,
 			Icon:     icon,
 		}
-		b := v1.EditModule(module, id)
+		b := models.EditModule(module, id)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -138,8 +138,8 @@ func EditModule(c *gin.Context) {
 }
 
 func AddModuleApis(c *gin.Context) {
-	MA := v1.ModuleApis{}
-	err := c.BindJSON(&MA)
+	MA := models.ModuleApis{}
+	err := c.ShouldBindJSON(&MA)
 	code := e.INVALID_PARAMS
 	if err != nil {
 		log.Println(err)
@@ -151,7 +151,7 @@ func AddModuleApis(c *gin.Context) {
 	} else {
 		id := uuid.FromStringOrNil(MA.Id)
 		apis := MA.Apis
-		b := v1.AddModuleApis(apis, id)
+		b := models.AddModuleApis(apis, id)
 		if b {
 			code = e.SUCCESS
 		} else {
@@ -174,7 +174,7 @@ func ModuleApis(c *gin.Context) {
 	if !valid.HasErrors() {
 		code = e.SUCCESS
 
-		res.Data = v1.GetModuleApis(uuid.FromStringOrNil(id))
+		res.Data = models.GetModuleApis(uuid.FromStringOrNil(id))
 	} else {
 		util.LoopLog(valid.Errors)
 	}

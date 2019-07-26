@@ -1,7 +1,7 @@
-package v1
+package models
 
 import (
-	"blog/pkg/setting"
+	"blog/pkg/set"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -38,7 +38,7 @@ func init() {
 		err                                               error
 		dbType, dbName, user, password, host, tablePrefix string
 	)
-	sec, err := setting.Cfg.GetSection("database")
+	sec, err := set.Cfg.GetSection("database")
 	if err != nil {
 		log.Fatal(2, "Fail to get section 'database': %v", err)
 	}
@@ -63,7 +63,7 @@ func init() {
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
-	db.AutoMigrate(&User{}, &Role{}, &Module{}, &Api{})
+	db.AutoMigrate(&User{}, &Role{}, &Module{}, &Api{}, &Article{}, &Category{}, &Tag{})
 }
 
 func CloseDB() {
