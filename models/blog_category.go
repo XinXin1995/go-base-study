@@ -5,10 +5,15 @@ type Category struct {
 	Name string `json:"name"`
 }
 
+func GetAllCategories(name string) (categories []Category) {
+	db.Where("name LIKE ?", "%"+name+"%").Find(&categories)
+	return
+}
+
 func GetCategories(pageSize int, pageNo int, name string) (categories []Category, count int) {
 	offset := (pageNo - 1) * pageSize
 	db.Where("name LIKE ?", "%"+name+"%").Limit(pageSize).Offset(offset).Find(&categories)
-	db.Model(&Tag{}).Where("name LIKE ?", "%"+name+"%").Count(&count)
+	db.Model(&Category{}).Where("name LIKE ?", "%"+name+"%").Count(&count)
 	return
 }
 

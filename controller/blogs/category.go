@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+func AllCategories(c *gin.Context) {
+	name := c.DefaultQuery("name", "")
+	res := &util.Res{
+		Code: e.SUCCESS,
+		Msg:  e.MsgUser[e.SUCCESS],
+		Data: models.GetAllCategories(name),
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 func Categories(c *gin.Context) {
 	name := c.Query("name")
 	pageNo, _ := com.StrTo(c.Query("pageNo")).Int()

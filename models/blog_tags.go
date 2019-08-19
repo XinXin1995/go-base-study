@@ -2,7 +2,15 @@ package models
 
 type Tag struct {
 	Model
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	Hit    int    `json:"hit"`
+	Effect string `json:"effect"`
+	Color  string `json:"color"`
+}
+
+func GetAllTags(name string) (tags []Tag) {
+	db.Where("name LIKE ?", "%"+name+"%").Find(&tags)
+	return
 }
 
 func GetTags(pageSize int, pageNo int, name string) (tags []Tag, count int) {
@@ -35,4 +43,8 @@ func DelTag(id string) bool {
 	} else {
 		return true
 	}
+}
+func GetTagsById(tagIds []string) (tags []Tag) {
+	db.Where("uuid in (?)", tagIds).Find(&tags)
+	return
 }

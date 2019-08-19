@@ -8,7 +8,18 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
+
+func AllTags(c *gin.Context) {
+	name := c.DefaultQuery("name", "")
+	res := &util.Res{
+		Code: e.SUCCESS,
+		Msg:  e.MsgUser[e.SUCCESS],
+		Data: models.GetAllTags(name),
+	}
+	c.JSON(http.StatusOK, res)
+}
 
 func Tags(c *gin.Context) {
 	name := c.Query("name")
@@ -35,12 +46,18 @@ func Tags(c *gin.Context) {
 
 func AddTag(c *gin.Context) {
 	name := c.PostForm("name")
+	color := c.PostForm("color")
+	hit, _ := strconv.Atoi(c.PostForm("hit"))
+	effect := c.PostForm("effect")
 	valid := validation.Validation{}
-	valid.Required(name, "name").Message("登录名为空")
+	valid.Required(name, "name").Message("标签名为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		tag := &models.Tag{
-			Name: name,
+			Name:   name,
+			Hit:    hit,
+			Effect: effect,
+			Color:  color,
 		}
 		b := models.AddTag(tag)
 		if b {
@@ -62,13 +79,19 @@ func AddTag(c *gin.Context) {
 func EditTag(c *gin.Context) {
 	id := c.PostForm("id")
 	name := c.PostForm("name")
+	color := c.PostForm("color")
+	hit, _ := strconv.Atoi(c.PostForm("hit"))
+	effect := c.PostForm("effect")
 	valid := validation.Validation{}
 	valid.Required(id, "id").Message("标签ID不能为空")
 	valid.Required(name, "name").Message("标签名为空")
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
 		tag := &models.Tag{
-			Name: name,
+			Name:   name,
+			Hit:    hit,
+			Effect: effect,
+			Color:  color,
 		}
 		b := models.EditTag(tag, id)
 		if b {
